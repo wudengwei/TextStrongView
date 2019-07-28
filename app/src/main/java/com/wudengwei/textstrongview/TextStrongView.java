@@ -173,12 +173,7 @@ public class TextStrongView extends AppCompatTextView {
                 if (event.getX() > getLeft() && event.getX() <getRight()
                         && event.getY() > getTop() && event.getY() <getBottom()) {
                     if (isSetDrawableSelectedFlag) {
-                        isSetDrawableSelected = !isSetDrawableSelected;
-                        if (isSetDrawableSelected) {
-                            setDrawableSelected();
-                        } else {
-                            setDrawable();
-                        }
+                        setDrawableIsSelected(!isSetDrawableSelected);
                     }
                 }
                 break;
@@ -252,4 +247,16 @@ public class TextStrongView extends AppCompatTextView {
         setCompoundDrawables(drawableLeftSelected, drawableTopSelected, drawableRightSelected, drawableBottomSelected);
     }
 
+    /**
+     * 主动设置是否被选中
+     * @param isSelected
+     */
+    public void setDrawableIsSelected(boolean isSelected) {
+        isSetDrawableSelected = isSelected;
+        if (isSetDrawableSelected) {
+            setDrawableSelected();
+        } else {
+            setDrawable();
+        }
+    }
 }

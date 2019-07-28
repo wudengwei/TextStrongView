@@ -14,5 +14,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextStrongView textStrongView = findViewById(R.id.tv_kkk);
+        textStrongView.setDrawableIsSelected(true);
     }
 }
