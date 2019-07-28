@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <com.wudengwei.textstrongview.TextStrongView
+        android:id="@+id/tv_kkk"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:text="标题"
+        android:gravity="center_vertical"
+        app:drawableLeft="@color/colorAccent"
+        app:drawableLeftSelected="@android:color/holo_blue_light"
+        app:drawableRight="@color/colorAccent"
+        app:drawableRightWidth="30dp"
+        app:drawableRightHeight="30dp"
+        app:drawableLeftWidth="15dp"
+        app:drawableLeftHeight="15dp"
+        app:radiusBottomLeft="50dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
+
+</LinearLayout>

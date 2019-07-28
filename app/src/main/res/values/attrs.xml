@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextStrongView">
+        <!-- 左边图片宽高 -->
+        <attr name="drawableLeftWidth" format="dimension"/>
+        <attr name="drawableLeftHeight" format="dimension"/>
+        <!-- 顶部图片宽高 -->
+        <attr name="drawableTopWidth" format="dimension"/>
+        <attr name="drawableTopHeight" format="dimension"/>
+        <!-- 右边图片宽高 -->
+        <attr name="drawableRightWidth" format="dimension"/>
+        <attr name="drawableRightHeight" format="dimension"/>
+        <!-- 底部图片宽高 -->
+        <attr name="drawableBottomWidth" format="dimension"/>
+        <attr name="drawableBottomHeight" format="dimension"/>
+        <!-- 图片 -->
+        <attr name="drawableLeft" format="reference|color"/>
+        <attr name="drawableTop" format="reference|color"/>
+        <attr name="drawableRight" format="reference|color"/>
+        <attr name="drawableBottom" format="reference|color"/>
+        <!-- 图片被选中 -->
+        <attr name="drawableLeftSelected" format="reference|color"/>
+        <attr name="drawableTopSelected" format="reference|color"/>
+        <attr name="drawableRightSelected" format="reference|color"/>
+        <attr name="drawableBottomSelected" format="reference|color"/>
+        <!-- 裁剪圆角 -->
+        <attr name="radius" format="dimension"/>
+        <attr name="radiusTopLeft" format="dimension"/>
+        <attr name="radiusTopRight" format="dimension"/>
+        <attr name="radiusBottomLeft" format="dimension"/>
+        <attr name="radiusBottomRight" format="dimension"/>
+
+    </declare-styleable>
+</resources>
