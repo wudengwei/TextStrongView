@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -46,6 +48,7 @@ public class TextStrongView extends AppCompatTextView {
     //是否设置左、上、右、下图标选择
     private boolean isSetDrawableSelected = false;
 
+    private boolean isTextDrawableCenter = false;
     //点击效果设置
     private Paint clickPaint;
     //two radius values [X, Y]. The corners are ordered top-left, top-right, bottom-right, bottom-left
@@ -87,6 +90,20 @@ public class TextStrongView extends AppCompatTextView {
             drawableTopSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableTopSelected);
             drawableRightSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableRightSelected);
             drawableBottomSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableBottomSelected);
+            isTextDrawableCenter = typedArray.getBoolean(R.styleable.TextStrongView_isTextDrawableCenter, isTextDrawableCenter);
+            drawableLeft = getCompoundDrawables()[0]==null?drawableLeft:getCompoundDrawables()[0];
+            drawableTop = getCompoundDrawables()[1]==null?drawableTop:getCompoundDrawables()[1];
+            drawableRight = getCompoundDrawables()[2]==null?drawableRight:getCompoundDrawables()[2];
+            drawableBottom = getCompoundDrawables()[3]==null?drawableBottom:getCompoundDrawables()[3];
+            //设置图片文字居中
+            if (isTextDrawableCenter) {
+                if (drawableTop != null || drawableBottom != null) {
+                    setGravity(Gravity.CENTER_HORIZONTAL);
+                }
+                if (drawableLeft != null || drawableRight != null) {
+                    setGravity(Gravity.CENTER_VERTICAL);
+                }
+            }
             //裁剪圆角
             float radius = typedArray.getDimension(R.styleable.TextStrongView_radius, 0);
             topLeftRadius = typedArray.getDimension(R.styleable.TextStrongView_radiusTopLeft, radius);
@@ -138,6 +155,69 @@ public class TextStrongView extends AppCompatTextView {
             clipRound(canvas);
         }
         canvas.restore();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+//        if (drawableTop != null) {
+//            Rect rect = new Rect();
+////            float textWidth = getPaint().measureText(getText().toString());
+//            getPaint().getTextBounds(getText().toString(),0,getText().toString().length(),rect);
+//            int textWidth = rect.right - rect.left;
+//            float textHeight = rect.bottom - rect.top;
+//            Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+//            Log.e("onDraw","getPaint().getTextBounds测量出来的textHeight: "+textHeight+"==="+(fontMetrics.bottom-fontMetrics.top));
+//            textHeight = getPaint().descent()-getPaint().ascent();
+//            Log.e("onDraw","getPaint().descent()-getPaint().ascent()测量出来的textHeight: "+textHeight+"==="+(fontMetrics.bottom-fontMetrics.top));
+//            //文本行数*行高度（行高度包含getLineSpacingExtra()）
+//            if (getMaxLines() < getLineCount()) {
+//                textHeight = getMaxLines()*getLineHeight();
+//            } else {
+//                textHeight = getLineCount()*getLineHeight();
+//            }
+//            Log.e("onDraw","文本行数+额外行间距的textHeight: "+textHeight);
+//            Rect lineRect = new Rect();
+//            Log.e("onDraw","getLineCount(): "+getLineCount()+" ,getLineSpacingMultiplier(): "+getLineSpacingMultiplier()+" ,getLineHeight(): "+getLineHeight());
+//            int drawablePadding = getCompoundDrawablePadding();
+//            //高度居中
+//            int drawableHeight = drawableTop.getIntrinsicHeight();
+//            float bodyHeight = textHeight + drawableTopHeight + drawablePadding;
+//            float dy = (getHeight() - bodyHeight) * 0.5f;
+//            canvas.translate(0, (getHeight() - bodyHeight) * 0.5f);
+////            setPaddingRelative(0, (int) dy,0,0);
+//            Log.e("onDraw","getHeight(): "+getHeight()+" ,bodyHeight: "+bodyHeight+" ,textHeight: "+textHeight+" ,drawableHeight: "+drawableTopHeight+" ,drawablePadding: "+drawablePadding);
+//
+//            int drawableWidth = drawableTop.getIntrinsicWidth();
+//            float bodyWidth = textWidth + drawableWidth + drawablePadding;
+//            //canvas.translate((getWidth() - bodyWidth) / 2, 0);
+//        }
+        if (isTextDrawableCenter) {
+            if (drawableTop != null || drawableBottom != null) {
+                int textHeight,drawableHeight;
+                //文本行数*行高度（行高度包含getLineSpacingExtra()）
+                if (getMaxLines() < getLineCount()) {
+                    textHeight = getMaxLines()*getLineHeight();
+                } else {
+                    textHeight = getLineCount()*getLineHeight();
+                }
+                drawableHeight = drawableTopHeight + drawableBottomHeight;
+                float bodyHeight = textHeight + drawableHeight + getCompoundDrawablePadding();
+                int dy = (int) ((getHeight() - bodyHeight) * 0.5f);
+                setPaddingRelative(0, dy,0,dy);
+//                canvas.translate(0, dy);
+            }
+            if (drawableLeft != null || drawableRight != null) {
+                float textWidth;
+                int drawableWidth;
+                Rect rect = new Rect();
+                textWidth = getPaint().measureText(getText().toString());
+                drawableWidth = drawableLeftWidth + drawableRightWidth;
+                float bodyWidth = textWidth + drawableWidth + getCompoundDrawablePadding();
+                int dx = (int) ((getWidth() - bodyWidth) * 0.5f);
+                setPaddingRelative(dx, 0,dx,0);
+            }
+        }
+        super.onDraw(canvas);
     }
 
     //裁剪圆角区域

@@ -29,6 +29,7 @@
         <attr name="radiusTopRight" format="dimension"/>
         <attr name="radiusBottomLeft" format="dimension"/>
         <attr name="radiusBottomRight" format="dimension"/>
-
+        <!-- 图片文字居中（只能单方向） -->
+        <attr name="isTextDrawableCenter" format="boolean"/>
     </declare-styleable>
 </resources>

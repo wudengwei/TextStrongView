@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <com.wudengwei.textstrongview.TextStrongView
@@ -28,4 +29,119 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"/>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.wudengwei.textstrongview.TextStrongView
+                android:id="@+id/tv_www"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:text="标题标题标题标题标题标题标题标题标题标题"
+                android:drawableTop="@color/colorAccent"
+                app:drawableTopWidth="30dp"
+                app:drawableTopHeight="30dp"
+                android:drawableBottom="@color/colorAccent"
+                app:drawableBottomWidth="30dp"
+                app:drawableBottomHeight="30dp"
+                app:radius="10dp"
+                app:isTextDrawableCenter="true"
+                android:includeFontPadding="true"
+                android:background="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="includeFontPadding='true'"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.wudengwei.textstrongview.TextStrongView
+                android:id="@+id/tv_www2"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:text="标题"
+                android:drawableTop="@color/colorAccent"
+                app:drawableTopWidth="30dp"
+                app:drawableTopHeight="30dp"
+                android:drawableBottom="@color/colorAccent"
+                app:drawableBottomWidth="30dp"
+                app:drawableBottomHeight="30dp"
+                app:radius="10dp"
+                app:isTextDrawableCenter="true"
+                android:includeFontPadding="false"
+                android:background="@color/colorPrimaryDark"/>
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="includeFontPadding='false'"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.wudengwei.textstrongview.TextStrongView
+                android:id="@+id/tv_qqq"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:text="标题标题标题标题"
+                android:drawableLeft="@color/colorAccent"
+                app:drawableLeftWidth="30dp"
+                app:drawableLeftHeight="30dp"
+                android:drawableRight="@color/colorAccent"
+                app:drawableRightWidth="30dp"
+                app:drawableRightHeight="30dp"
+                app:radius="10dp"
+                app:isTextDrawableCenter="true"
+                android:includeFontPadding="true"
+                android:background="@color/colorPrimary"/>
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="includeFontPadding='false'"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.wudengwei.textstrongview.TextStrongView
+                android:id="@+id/tv_qqq2"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:text="标题"
+                android:drawableLeft="@color/colorAccent"
+                app:drawableLeftWidth="30dp"
+                app:drawableLeftHeight="30dp"
+                android:drawableRight="@color/colorAccent"
+                app:drawableRightWidth="30dp"
+                app:drawableRightHeight="30dp"
+                app:radius="10dp"
+                app:isTextDrawableCenter="true"
+                android:includeFontPadding="false"
+                android:background="@color/colorPrimaryDark"/>
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="includeFontPadding='false'"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
