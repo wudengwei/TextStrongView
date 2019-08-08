@@ -31,5 +31,15 @@
         <attr name="radiusBottomRight" format="dimension"/>
         <!-- 图片文字居中（只能单方向） -->
         <attr name="isTextDrawableCenter" format="boolean"/>
+        <!-- 边框颜色 -->
+        <attr name="strokeColor" format="color"/>
+        <!-- 边框宽度 -->
+        <attr name="strokeWidth" format="dimension"/>
+        <!-- 边框圆角 -->
+        <attr name="strokeRadius" format="dimension"/>
+        <attr name="strokeRadiusTopLeft" format="dimension"/>
+        <attr name="strokeRadiusTopRight" format="dimension"/>
+        <attr name="strokeRadiusBottomLeft" format="dimension"/>
+        <attr name="strokeRadiusBottomRight" format="dimension"/>
     </declare-styleable>
 </resources>

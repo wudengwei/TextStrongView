@@ -144,4 +144,32 @@
                 android:text="includeFontPadding='false'"/>
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+        <com.wudengwei.textstrongview.TextStrongView
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:gravity="center"
+            android:text="获取验证码"
+            android:textColor="#FFBE31"
+            app:strokeWidth="1dp"
+            app:strokeColor="#FFBE31"
+            app:strokeRadiusTopLeft="10dp"
+            app:strokeRadiusBottomRight="10dp"
+            android:layout_marginLeft="30dp"/>
+        <com.wudengwei.textstrongview.TextStrongView
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:gravity="center"
+            android:text="获取验证码"
+            android:textColor="#FFBE31"
+            app:strokeWidth="1dp"
+            app:strokeColor="#000000"
+            app:strokeRadius="35dp"
+            app:radius="35dp"
+            android:background="#bbbbbb"
+            android:layout_marginLeft="30dp"/>
+    </LinearLayout>
 </LinearLayout>

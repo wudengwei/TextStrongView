@@ -56,6 +56,13 @@ public class TextStrongView extends AppCompatTextView {
     private Paint roundPaint;//裁剪圆角的画笔
     private RectF roundRect;//包含圆角矩形的路径的layer区域
     private Path roundPath;//圆角矩形的路径
+    //边框
+    private float[] radiusStrokeArray = new float[8];
+    private Paint strokePaint;//边框的画笔
+    private RectF strokeRect;//边框的区域
+    private Path strokePath;//边框的路径
+    private int strokeColor;//边框颜色
+    private float strokeWidth = 0;//边框宽度
 
     public TextStrongView(Context context) {
         this(context, null);
@@ -72,6 +79,10 @@ public class TextStrongView extends AppCompatTextView {
         float topRightRadius = 0;
         float bottomLeftRadius = 0;
         float bottomRightRadius = 0;
+        float strokeRadiusTopLeft = 0;
+        float strokeRadiusTopRight = 0;
+        float strokeRadiusBottomLeft = 0;
+        float strokeRadiusBottomRight = 0;
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TextStrongView);
             drawableLeftWidth = typedArray.getDimensionPixelSize(R.styleable.TextStrongView_drawableLeftWidth, 0);
@@ -91,6 +102,15 @@ public class TextStrongView extends AppCompatTextView {
             drawableRightSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableRightSelected);
             drawableBottomSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableBottomSelected);
             isTextDrawableCenter = typedArray.getBoolean(R.styleable.TextStrongView_isTextDrawableCenter, isTextDrawableCenter);
+
+            strokeColor = typedArray.getColor(R.styleable.TextStrongView_strokeColor, Color.BLACK);
+            strokeWidth = typedArray.getDimension(R.styleable.TextStrongView_strokeWidth, strokeWidth);
+            float strokeRadius = typedArray.getDimension(R.styleable.TextStrongView_strokeRadius, 0);
+            strokeRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopLeft, strokeRadius);
+            strokeRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopRight, strokeRadius);
+            strokeRadiusBottomLeft = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusBottomLeft, strokeRadius);
+            strokeRadiusBottomRight = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusBottomRight, strokeRadius);
+
             drawableLeft = getCompoundDrawables()[0]==null?drawableLeft:getCompoundDrawables()[0];
             drawableTop = getCompoundDrawables()[1]==null?drawableTop:getCompoundDrawables()[1];
             drawableRight = getCompoundDrawables()[2]==null?drawableRight:getCompoundDrawables()[2];
@@ -133,10 +153,44 @@ public class TextStrongView extends AppCompatTextView {
         radiusArray[7] = bottomLeftRadius;
         //裁剪圆角的画笔
         roundPaint = new Paint();
+        roundPaint.setColor(Color.WHITE);
+        roundPaint.setAntiAlias(true);
+        roundPaint.setStyle(Paint.Style.FILL);
         //圆角矩形的路径
         roundPath = new Path();
         //包含圆角矩形的路径的layer区域
         roundRect = new RectF();
+
+        radiusStrokeArray[0] = strokeRadiusTopLeft;
+        radiusStrokeArray[1] = strokeRadiusTopLeft;
+        radiusStrokeArray[2] = strokeRadiusTopRight;
+        radiusStrokeArray[3] = strokeRadiusTopRight;
+        radiusStrokeArray[4] = strokeRadiusBottomRight;
+        radiusStrokeArray[5] = strokeRadiusBottomRight;
+        radiusStrokeArray[6] = strokeRadiusBottomLeft;
+        radiusStrokeArray[7] = strokeRadiusBottomLeft;
+        strokePaint = new Paint();
+        strokePaint.setAntiAlias(true);
+        strokePaint.setColor(strokeColor);
+        if (isClip()) {
+            strokePaint.setStrokeWidth(strokeWidth*2);
+        } else {
+            strokePaint.setStrokeWidth(strokeWidth);
+        }
+        strokePaint.setStyle(Paint.Style.STROKE);
+        strokePath = new Path();
+        strokeRect = new RectF();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (isClip()) {
+            roundRect.set(0,0,getWidth(),getHeight());
+            strokeRect.set(0,0,getWidth(),getHeight());
+        } else {
+            strokeRect.set(strokeWidth,strokeWidth,getWidth()-strokeWidth,getHeight()-strokeWidth);
+        }
     }
 
     /**
@@ -146,15 +200,16 @@ public class TextStrongView extends AppCompatTextView {
      */
     @Override
     public void draw(Canvas canvas) {
-        //使用canvas.saveLayer()配合roundPaint.setXfermode裁剪圆角区域
-        roundRect.set(0,0,getWidth(),getHeight());
-        canvas.saveLayer(roundRect, null, Canvas.ALL_SAVE_FLAG);
-        super.draw(canvas);
-        if (radiusArray[0] != 0 || radiusArray[2] != 0 || radiusArray[4] != 0 || radiusArray[6] != 0) {
+        if (isClip()) {
+            //使用canvas.saveLayer()配合roundPaint.setXfermode裁剪圆角区域
+            canvas.saveLayer(roundRect, null, Canvas.ALL_SAVE_FLAG);
+            super.draw(canvas);
             //裁剪圆角区域
             clipRound(canvas);
+            canvas.restore();
+        } else {
+            super.draw(canvas);
         }
-        canvas.restore();
     }
 
     @Override
@@ -209,7 +264,6 @@ public class TextStrongView extends AppCompatTextView {
             if (drawableLeft != null || drawableRight != null) {
                 float textWidth;
                 int drawableWidth;
-                Rect rect = new Rect();
                 textWidth = getPaint().measureText(getText().toString());
                 drawableWidth = drawableLeftWidth + drawableRightWidth;
                 float bodyWidth = textWidth + drawableWidth + getCompoundDrawablePadding();
@@ -218,16 +272,22 @@ public class TextStrongView extends AppCompatTextView {
             }
         }
         super.onDraw(canvas);
+        //画边框
+        if (strokeWidth > 0) {
+            strokePath.addRoundRect(strokeRect,radiusStrokeArray, Path.Direction.CW);
+            canvas.drawPath(strokePath,strokePaint);
+        }
+    }
+
+    private boolean isClip() {
+        return radiusArray[0] != 0 || radiusArray[1] != 0 || radiusArray[2] != 0 || radiusArray[3] != 0
+                || radiusArray[4] != 0 || radiusArray[5] != 0 || radiusArray[6] != 0 || radiusArray[7] != 0;
     }
 
     //裁剪圆角区域
     private void clipRound(Canvas canvas) {
         roundPath.reset();
         roundPath.addRoundRect(roundRect, radiusArray, Path.Direction.CW);
-        //画笔设置
-        roundPaint.setColor(Color.WHITE);
-        roundPaint.setAntiAlias(true);
-        roundPaint.setStyle(Paint.Style.FILL);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
             roundPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
             canvas.drawPath(roundPath, roundPaint);
@@ -316,7 +376,7 @@ public class TextStrongView extends AppCompatTextView {
     }
 
     public void setDrawableSelected(@Nullable Drawable left, @Nullable Drawable top,
-                            @Nullable Drawable right, @Nullable Drawable bottom) {
+                                    @Nullable Drawable right, @Nullable Drawable bottom) {
         if (!isSetDrawableSelected) {
             isSetDrawableSelected = true;
         }
