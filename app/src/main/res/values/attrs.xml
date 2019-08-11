@@ -41,5 +41,20 @@
         <attr name="strokeRadiusTopRight" format="dimension"/>
         <attr name="strokeRadiusBottomLeft" format="dimension"/>
         <attr name="strokeRadiusBottomRight" format="dimension"/>
+        <!-- 阴影半径 -->
+        <attr name="shadowElevation" format="dimension"/>
+        <!-- 阴影颜色 -->
+        <attr name="shadowColor" format="reference|color"/>
+        <!-- 阴影偏移（dp、px等等）-->
+        <attr name="shadow_x" format="dimension"/>
+        <!-- 阴影偏移（dp、px等等）-->
+        <attr name="shadow_y" format="dimension"/>
+        <!-- 阴影圆角 -->
+        <attr name="shadowRadius" format="dimension"/>
+        <attr name="shadowRadiusTopLeft" format="dimension"/>
+        <attr name="shadowRadiusTopRight" format="dimension"/>
+        <attr name="shadowRadiusBottomLeft" format="dimension"/>
+        <attr name="shadowRadiusBottomRight" format="dimension"/>
+
     </declare-styleable>
 </resources>

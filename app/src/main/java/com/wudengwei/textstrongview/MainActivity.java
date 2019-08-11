@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextStrongView textStrongView = findViewById(R.id.tv_kkk);
-        textStrongView.setDrawableIsSelected(true);
+//        final TextStrongView textStrongView = findViewById(R.id.tv_kkk);
+//        textStrongView.setDrawableIsSelected(true);
     }
 }

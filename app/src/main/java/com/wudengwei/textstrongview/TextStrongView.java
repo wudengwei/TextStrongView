@@ -3,6 +3,7 @@ package com.wudengwei.textstrongview;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Region;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -63,6 +65,16 @@ public class TextStrongView extends AppCompatTextView {
     private Path strokePath;//边框的路径
     private int strokeColor;//边框颜色
     private float strokeWidth = 0;//边框宽度
+    //阴影
+    private float[] radiusShadowArray = new float[8];
+    private Paint shadowPaint;
+    private RectF shadowRect;
+    private Path shadowPath;
+    private float shadowElevation = 0;
+    private int shadowColor;
+    private float shadow_x = 0;//阴影偏移
+    private float shadow_y = 0;//阴影偏移
+    private Paint clipShadowPaint;
 
     public TextStrongView(Context context) {
         this(context, null);
@@ -83,6 +95,10 @@ public class TextStrongView extends AppCompatTextView {
         float strokeRadiusTopRight = 0;
         float strokeRadiusBottomLeft = 0;
         float strokeRadiusBottomRight = 0;
+        float shadowRadiusTopLeft = 0;
+        float shadowRadiusTopRight = 0;
+        float shadowRadiusBottomLeft = 0;
+        float shadowRadiusBottomRight = 0;
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TextStrongView);
             drawableLeftWidth = typedArray.getDimensionPixelSize(R.styleable.TextStrongView_drawableLeftWidth, 0);
@@ -102,14 +118,24 @@ public class TextStrongView extends AppCompatTextView {
             drawableRightSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableRightSelected);
             drawableBottomSelected = typedArray.getDrawable(R.styleable.TextStrongView_drawableBottomSelected);
             isTextDrawableCenter = typedArray.getBoolean(R.styleable.TextStrongView_isTextDrawableCenter, isTextDrawableCenter);
-
-            strokeColor = typedArray.getColor(R.styleable.TextStrongView_strokeColor, Color.BLACK);
+            //边框
+            strokeColor = typedArray.getColor(R.styleable.TextStrongView_strokeColor, Color.parseColor("#55000000"));
             strokeWidth = typedArray.getDimension(R.styleable.TextStrongView_strokeWidth, strokeWidth);
             float strokeRadius = typedArray.getDimension(R.styleable.TextStrongView_strokeRadius, 0);
             strokeRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopLeft, strokeRadius);
             strokeRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopRight, strokeRadius);
             strokeRadiusBottomLeft = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusBottomLeft, strokeRadius);
             strokeRadiusBottomRight = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusBottomRight, strokeRadius);
+            //阴影
+            shadowElevation = typedArray.getDimension(R.styleable.TextStrongView_shadowElevation, shadowElevation);
+            shadowColor = typedArray.getColor(R.styleable.TextStrongView_shadowColor, Color.BLACK);
+            float shadowRadius = typedArray.getDimension(R.styleable.TextStrongView_shadowRadius, 0);
+            shadowRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusTopLeft, shadowRadius);
+            shadowRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusTopRight, shadowRadius);
+            shadowRadiusBottomLeft = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusBottomLeft, shadowRadius);
+            shadowRadiusBottomRight = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusBottomRight, shadowRadius);
+            shadow_x = typedArray.getDimension(R.styleable.TextStrongView_shadow_x, 0);
+            shadow_y = typedArray.getDimension(R.styleable.TextStrongView_shadow_y, 0);
 
             drawableLeft = getCompoundDrawables()[0]==null?drawableLeft:getCompoundDrawables()[0];
             drawableTop = getCompoundDrawables()[1]==null?drawableTop:getCompoundDrawables()[1];
@@ -143,6 +169,7 @@ public class TextStrongView extends AppCompatTextView {
             //重新设置控件左、上、右、下图标（）
             setDrawable();
         }
+        //--------------------------裁剪--------------------------
         radiusArray[0] = topLeftRadius;
         radiusArray[1] = topLeftRadius;
         radiusArray[2] = topRightRadius;
@@ -161,6 +188,7 @@ public class TextStrongView extends AppCompatTextView {
         //包含圆角矩形的路径的layer区域
         roundRect = new RectF();
 
+        //--------------------------边框--------------------------
         radiusStrokeArray[0] = strokeRadiusTopLeft;
         radiusStrokeArray[1] = strokeRadiusTopLeft;
         radiusStrokeArray[2] = strokeRadiusTopRight;
@@ -180,6 +208,23 @@ public class TextStrongView extends AppCompatTextView {
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePath = new Path();
         strokeRect = new RectF();
+
+        //--------------------------阴影--------------------------
+        radiusShadowArray[0] = shadowRadiusTopLeft;
+        radiusShadowArray[1] = shadowRadiusTopLeft;
+        radiusShadowArray[2] = shadowRadiusTopRight;
+        radiusShadowArray[3] = shadowRadiusTopRight;
+        radiusShadowArray[4] = shadowRadiusBottomRight;
+        radiusShadowArray[5] = shadowRadiusBottomRight;
+        radiusShadowArray[6] = shadowRadiusBottomLeft;
+        radiusShadowArray[7] = shadowRadiusBottomLeft;
+        shadowPaint = new Paint();
+        shadowPaint.setAntiAlias(true);
+        shadowPaint.setStyle(Paint.Style.FILL);
+        shadowRect = new RectF();
+        shadowPath = new Path();
+        clipShadowPaint = new Paint();
+        clipShadowPaint.setAntiAlias(true);
     }
 
     @Override
@@ -189,7 +234,8 @@ public class TextStrongView extends AppCompatTextView {
             roundRect.set(0,0,getWidth(),getHeight());
             strokeRect.set(0,0,getWidth(),getHeight());
         } else {
-            strokeRect.set(strokeWidth,strokeWidth,getWidth()-strokeWidth,getHeight()-strokeWidth);
+            final float offset = strokeWidth*0.5f;
+            strokeRect.set(offset,offset,getWidth()-offset,getHeight()-offset);
         }
     }
 
@@ -210,42 +256,37 @@ public class TextStrongView extends AppCompatTextView {
         } else {
             super.draw(canvas);
         }
+        //画阴影
+        if (shadowElevation > 0) {
+            Bitmap srcBmp = createShadowBitmap((int) (getWidth()+shadowElevation*2), (int) (getHeight()+shadowElevation*2));
+            canvas.drawBitmap(srcBmp, shadow_x-shadowElevation, shadow_y-shadowElevation, clipShadowPaint);//绘制源目标
+        }
     }
 
+    //添加阴影bitmap
+    private Bitmap createShadowBitmap(int shadowWidth, int shadowHeight) {
+        Bitmap output = Bitmap.createBitmap(shadowWidth, shadowHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        shadowRect.set(shadowElevation-shadow_x,shadowElevation-shadow_y,shadowWidth-shadowElevation-shadow_x,shadowHeight-shadowElevation-shadow_y);
+
+        shadowPaint.setColor(shadowColor);
+        if (!isInEditMode()) {
+            shadowPaint.setShadowLayer(shadowElevation, shadow_x, shadow_y, shadowColor);
+        }
+        shadowPath.reset();
+        shadowPath.addRoundRect(shadowRect, radiusShadowArray, Path.Direction.CW);
+        //保留shadowPath路径以外区域
+        canvas.clipPath(shadowPath, Region.Op.DIFFERENCE);
+        canvas.drawPath(shadowPath, shadowPaint);
+
+        return output;
+    }
+
+    private boolean isSetPadding = false;
     @Override
     protected void onDraw(Canvas canvas) {
-//        if (drawableTop != null) {
-//            Rect rect = new Rect();
-////            float textWidth = getPaint().measureText(getText().toString());
-//            getPaint().getTextBounds(getText().toString(),0,getText().toString().length(),rect);
-//            int textWidth = rect.right - rect.left;
-//            float textHeight = rect.bottom - rect.top;
-//            Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-//            Log.e("onDraw","getPaint().getTextBounds测量出来的textHeight: "+textHeight+"==="+(fontMetrics.bottom-fontMetrics.top));
-//            textHeight = getPaint().descent()-getPaint().ascent();
-//            Log.e("onDraw","getPaint().descent()-getPaint().ascent()测量出来的textHeight: "+textHeight+"==="+(fontMetrics.bottom-fontMetrics.top));
-//            //文本行数*行高度（行高度包含getLineSpacingExtra()）
-//            if (getMaxLines() < getLineCount()) {
-//                textHeight = getMaxLines()*getLineHeight();
-//            } else {
-//                textHeight = getLineCount()*getLineHeight();
-//            }
-//            Log.e("onDraw","文本行数+额外行间距的textHeight: "+textHeight);
-//            Rect lineRect = new Rect();
-//            Log.e("onDraw","getLineCount(): "+getLineCount()+" ,getLineSpacingMultiplier(): "+getLineSpacingMultiplier()+" ,getLineHeight(): "+getLineHeight());
-//            int drawablePadding = getCompoundDrawablePadding();
-//            //高度居中
-//            int drawableHeight = drawableTop.getIntrinsicHeight();
-//            float bodyHeight = textHeight + drawableTopHeight + drawablePadding;
-//            float dy = (getHeight() - bodyHeight) * 0.5f;
-//            canvas.translate(0, (getHeight() - bodyHeight) * 0.5f);
-////            setPaddingRelative(0, (int) dy,0,0);
-//            Log.e("onDraw","getHeight(): "+getHeight()+" ,bodyHeight: "+bodyHeight+" ,textHeight: "+textHeight+" ,drawableHeight: "+drawableTopHeight+" ,drawablePadding: "+drawablePadding);
-//
-//            int drawableWidth = drawableTop.getIntrinsicWidth();
-//            float bodyWidth = textWidth + drawableWidth + drawablePadding;
-//            //canvas.translate((getWidth() - bodyWidth) / 2, 0);
-//        }
+        //图文居中
         if (isTextDrawableCenter) {
             if (drawableTop != null || drawableBottom != null) {
                 int textHeight,drawableHeight;
@@ -258,7 +299,10 @@ public class TextStrongView extends AppCompatTextView {
                 drawableHeight = drawableTopHeight + drawableBottomHeight;
                 float bodyHeight = textHeight + drawableHeight + getCompoundDrawablePadding();
                 int dy = (int) ((getHeight() - bodyHeight) * 0.5f);
-                setPaddingRelative(0, dy,0,dy);
+                if (!isSetPadding) {
+                    setPaddingRelative(0, dy,0,dy);
+                    isSetPadding = true;
+                }
 //                canvas.translate(0, dy);
             }
             if (drawableLeft != null || drawableRight != null) {
@@ -268,7 +312,10 @@ public class TextStrongView extends AppCompatTextView {
                 drawableWidth = drawableLeftWidth + drawableRightWidth;
                 float bodyWidth = textWidth + drawableWidth + getCompoundDrawablePadding();
                 int dx = (int) ((getWidth() - bodyWidth) * 0.5f);
-                setPaddingRelative(dx, 0,dx,0);
+                if (!isSetPadding) {
+                    setPaddingRelative(dx, 0,dx,0);
+                    isSetPadding = true;
+                }
             }
         }
         super.onDraw(canvas);
