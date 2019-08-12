@@ -6,14 +6,17 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -48,7 +51,7 @@ public class TextStrongView extends AppCompatTextView {
     //app:drawableLeftSelected...设置后，点击后左、上、右、下图标自动设置为app:drawableLeftSelected...对应的图片
     private boolean isSetDrawableSelectedFlag = false;
     //是否设置左、上、右、下图标选择
-    private boolean isSetDrawableSelected = false;
+    private boolean isDrawableSelected = false;
 
     private boolean isTextDrawableCenter = false;
     //点击效果设置
@@ -65,16 +68,30 @@ public class TextStrongView extends AppCompatTextView {
     private Path strokePath;//边框的路径
     private int strokeColor;//边框颜色
     private float strokeWidth = 0;//边框宽度
+    private float[] strokeDashEffectArr = new float[2];
     //阴影
     private float[] radiusShadowArray = new float[8];
     private Paint shadowPaint;
     private RectF shadowRect;
     private Path shadowPath;
     private float shadowElevation = 0;
-    private int shadowColor;
+    private int shadowColor;//阴影色
+    private int shadowBackground;//shadowPaint填充色
     private float shadow_x = 0;//阴影偏移
     private float shadow_y = 0;//阴影偏移
     private Paint clipShadowPaint;
+    private boolean clipShadowPath = true;
+    //渐变
+    private float[] radiusGradientArray = new float[8];
+    private int[] gradientColorArr = new int[2];
+    private int gradientColorStart;//渐变色-开始
+    private int gradientStrokeColor;//边框颜色
+    private float gradientStrokeDashWidth;//边框虚线宽度
+    private float gradientStrokeDashGap;//边框虚线间隙
+    private int gradientStrokeWidth;//边框宽度
+    private int gradientColorEnd;//阴影色-结束
+    private Rect gradientRect;//渐变区域
+
 
     public TextStrongView(Context context) {
         this(context, null);
@@ -99,6 +116,10 @@ public class TextStrongView extends AppCompatTextView {
         float shadowRadiusTopRight = 0;
         float shadowRadiusBottomLeft = 0;
         float shadowRadiusBottomRight = 0;
+        float gradientRadiusTopLeft = 0;
+        float gradientRadiusTopRight = 0;
+        float gradientRadiusBottomLeft = 0;
+        float gradientRadiusBottomRight = 0;
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TextStrongView);
             drawableLeftWidth = typedArray.getDimensionPixelSize(R.styleable.TextStrongView_drawableLeftWidth, 0);
@@ -121,6 +142,10 @@ public class TextStrongView extends AppCompatTextView {
             //边框
             strokeColor = typedArray.getColor(R.styleable.TextStrongView_strokeColor, Color.parseColor("#55000000"));
             strokeWidth = typedArray.getDimension(R.styleable.TextStrongView_strokeWidth, strokeWidth);
+            float strokeDashWidth = typedArray.getDimension(R.styleable.TextStrongView_strokeDashWidth, 0);
+            float strokeDashGap = typedArray.getDimension(R.styleable.TextStrongView_strokeDashGap, 0);
+            strokeDashEffectArr[0] = strokeDashWidth;
+            strokeDashEffectArr[1] = strokeDashGap;
             float strokeRadius = typedArray.getDimension(R.styleable.TextStrongView_strokeRadius, 0);
             strokeRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopLeft, strokeRadius);
             strokeRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_strokeRadiusTopRight, strokeRadius);
@@ -129,6 +154,8 @@ public class TextStrongView extends AppCompatTextView {
             //阴影
             shadowElevation = typedArray.getDimension(R.styleable.TextStrongView_shadowElevation, shadowElevation);
             shadowColor = typedArray.getColor(R.styleable.TextStrongView_shadowColor, Color.BLACK);
+            shadowBackground = typedArray.getColor(R.styleable.TextStrongView_shadowBackground, Color.BLACK);
+            clipShadowPath = typedArray.getBoolean(R.styleable.TextStrongView_clipShadowPath, clipShadowPath);
             float shadowRadius = typedArray.getDimension(R.styleable.TextStrongView_shadowRadius, 0);
             shadowRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusTopLeft, shadowRadius);
             shadowRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusTopRight, shadowRadius);
@@ -136,6 +163,18 @@ public class TextStrongView extends AppCompatTextView {
             shadowRadiusBottomRight = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusBottomRight, shadowRadius);
             shadow_x = typedArray.getDimension(R.styleable.TextStrongView_shadow_x, 0);
             shadow_y = typedArray.getDimension(R.styleable.TextStrongView_shadow_y, 0);
+            //渐变
+            float gradientRadius = typedArray.getDimension(R.styleable.TextStrongView_gradientRadius, 0);
+            gradientRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_gradientRadiusTopLeft, gradientRadius);
+            gradientRadiusTopRight = typedArray.getDimension(R.styleable.TextStrongView_gradientRadiusTopRight, gradientRadius);
+            gradientRadiusBottomLeft = typedArray.getDimension(R.styleable.TextStrongView_gradientRadiusBottomLeft, gradientRadius);
+            gradientRadiusBottomRight = typedArray.getDimension(R.styleable.TextStrongView_gradientRadiusBottomRight, gradientRadius);
+            gradientColorStart = typedArray.getColor(R.styleable.TextStrongView_gradientColorStart, 0);
+            gradientColorEnd = typedArray.getColor(R.styleable.TextStrongView_gradientColorEnd, 0);
+            gradientStrokeWidth = typedArray.getDimensionPixelSize(R.styleable.TextStrongView_gradientStrokeWidth, 0);
+            gradientStrokeColor = typedArray.getColor(R.styleable.TextStrongView_gradientStrokeColor, 0);
+            gradientStrokeDashWidth = typedArray.getDimension(R.styleable.TextStrongView_gradientStrokeDashWidth, 0);
+            gradientStrokeDashGap = typedArray.getDimension(R.styleable.TextStrongView_gradientStrokeDashGap, 0);
 
             drawableLeft = getCompoundDrawables()[0]==null?drawableLeft:getCompoundDrawables()[0];
             drawableTop = getCompoundDrawables()[1]==null?drawableTop:getCompoundDrawables()[1];
@@ -200,6 +239,10 @@ public class TextStrongView extends AppCompatTextView {
         strokePaint = new Paint();
         strokePaint.setAntiAlias(true);
         strokePaint.setColor(strokeColor);
+        if (strokeDashEffectArr[0] != 0 && strokeDashEffectArr[1] != 0) {
+            DashPathEffect pathEffect = new DashPathEffect(strokeDashEffectArr, 0);
+            strokePaint.setPathEffect(pathEffect);
+        }
         if (isClip()) {
             strokePaint.setStrokeWidth(strokeWidth*2);
         } else {
@@ -225,6 +268,17 @@ public class TextStrongView extends AppCompatTextView {
         shadowPath = new Path();
         clipShadowPaint = new Paint();
         clipShadowPaint.setAntiAlias(true);
+
+        //--------------------------渐变--------------------------
+        radiusGradientArray[0] = gradientRadiusTopLeft;
+        radiusGradientArray[1] = gradientRadiusTopLeft;
+        radiusGradientArray[2] = gradientRadiusTopRight;
+        radiusGradientArray[3] = gradientRadiusTopRight;
+        radiusGradientArray[4] = gradientRadiusBottomRight;
+        radiusGradientArray[5] = gradientRadiusBottomRight;
+        radiusGradientArray[6] = gradientRadiusBottomLeft;
+        radiusGradientArray[7] = gradientRadiusBottomLeft;
+        gradientRect = new Rect();
     }
 
     @Override
@@ -237,6 +291,8 @@ public class TextStrongView extends AppCompatTextView {
             final float offset = strokeWidth*0.5f;
             strokeRect.set(offset,offset,getWidth()-offset,getHeight()-offset);
         }
+        int offset = 0;
+        gradientRect.set(-offset,-offset,getWidth()+offset,getHeight()+offset);
     }
 
     /**
@@ -246,6 +302,16 @@ public class TextStrongView extends AppCompatTextView {
      */
     @Override
     public void draw(Canvas canvas) {
+        //画阴影
+        if (shadowElevation > 0) {
+            Bitmap srcBmp = createShadowBitmap((int) (getWidth()+shadowElevation*2), (int) (getHeight()+shadowElevation*2));
+            canvas.drawBitmap(srcBmp, shadow_x-shadowElevation, shadow_y-shadowElevation, clipShadowPaint);//绘制源目标
+        }
+        //渐变背景
+        if (gradientColorStart != 0 || gradientColorEnd != 0) {
+            GradientDrawable gradientDrawable = createGradientDrawable(gradientRect);
+            gradientDrawable.draw(canvas);
+        }
         if (isClip()) {
             //使用canvas.saveLayer()配合roundPaint.setXfermode裁剪圆角区域
             canvas.saveLayer(roundRect, null, Canvas.ALL_SAVE_FLAG);
@@ -256,11 +322,6 @@ public class TextStrongView extends AppCompatTextView {
         } else {
             super.draw(canvas);
         }
-        //画阴影
-        if (shadowElevation > 0) {
-            Bitmap srcBmp = createShadowBitmap((int) (getWidth()+shadowElevation*2), (int) (getHeight()+shadowElevation*2));
-            canvas.drawBitmap(srcBmp, shadow_x-shadowElevation, shadow_y-shadowElevation, clipShadowPaint);//绘制源目标
-        }
     }
 
     //添加阴影bitmap
@@ -270,17 +331,32 @@ public class TextStrongView extends AppCompatTextView {
 
         shadowRect.set(shadowElevation-shadow_x,shadowElevation-shadow_y,shadowWidth-shadowElevation-shadow_x,shadowHeight-shadowElevation-shadow_y);
 
-        shadowPaint.setColor(shadowColor);
+        shadowPaint.setColor(shadowBackground);
         if (!isInEditMode()) {
             shadowPaint.setShadowLayer(shadowElevation, shadow_x, shadow_y, shadowColor);
         }
         shadowPath.reset();
         shadowPath.addRoundRect(shadowRect, radiusShadowArray, Path.Direction.CW);
-        //保留shadowPath路径以外区域
-        canvas.clipPath(shadowPath, Region.Op.DIFFERENCE);
+        if (clipShadowPath) {
+            //保留shadowPath路径以外区域
+            canvas.clipPath(shadowPath, Region.Op.DIFFERENCE);
+        }
         canvas.drawPath(shadowPath, shadowPaint);
 
         return output;
+    }
+
+    //渐变
+    private GradientDrawable createGradientDrawable(Rect bounds) {
+        gradientColorArr[0] = gradientColorStart;
+        gradientColorArr[1] = gradientColorEnd;
+        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,gradientColorArr);
+        gradientDrawable.setBounds(bounds);
+        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setCornerRadii(radiusGradientArray);
+        if (gradientStrokeWidth != 0)
+            gradientDrawable.setStroke(gradientStrokeWidth,gradientStrokeColor,gradientStrokeDashWidth,gradientStrokeDashGap);
+        return gradientDrawable;
     }
 
     private boolean isSetPadding = false;
@@ -360,7 +436,7 @@ public class TextStrongView extends AppCompatTextView {
                 if (event.getX() > getLeft() && event.getX() <getRight()
                         && event.getY() > getTop() && event.getY() <getBottom()) {
                     if (isSetDrawableSelectedFlag) {
-                        setDrawableIsSelected(!isSetDrawableSelected);
+                        setDrawableSelected(!isDrawableSelected);
                     }
                 }
                 break;
@@ -412,8 +488,8 @@ public class TextStrongView extends AppCompatTextView {
 
     public void setDrawable(@Nullable Drawable left, @Nullable Drawable top,
                             @Nullable Drawable right, @Nullable Drawable bottom) {
-        if (isSetDrawableSelected) {
-            isSetDrawableSelected = false;
+        if (isDrawableSelected) {
+            isDrawableSelected = false;
         }
         drawableLeft = left;
         drawableTop = top;
@@ -424,8 +500,8 @@ public class TextStrongView extends AppCompatTextView {
 
     public void setDrawableSelected(@Nullable Drawable left, @Nullable Drawable top,
                                     @Nullable Drawable right, @Nullable Drawable bottom) {
-        if (!isSetDrawableSelected) {
-            isSetDrawableSelected = true;
+        if (!isDrawableSelected) {
+            isDrawableSelected = true;
         }
         drawableLeftSelected = left;
         drawableTopSelected = top;
@@ -434,13 +510,17 @@ public class TextStrongView extends AppCompatTextView {
         setCompoundDrawables(drawableLeftSelected, drawableTopSelected, drawableRightSelected, drawableBottomSelected);
     }
 
+    public boolean isDrawableSelected() {
+        return isDrawableSelected;
+    }
+
     /**
      * 主动设置是否被选中
-     * @param isSelected
+     * @param drawableSelected true 选中，false 不选中
      */
-    public void setDrawableIsSelected(boolean isSelected) {
-        isSetDrawableSelected = isSelected;
-        if (isSetDrawableSelected) {
+    public void setDrawableSelected(boolean drawableSelected) {
+        isDrawableSelected = drawableSelected;
+        if (isDrawableSelected) {
             setDrawableSelected();
         } else {
             setDrawable();

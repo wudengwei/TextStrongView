@@ -35,6 +35,10 @@
         <attr name="strokeColor" format="color"/>
         <!-- 边框宽度 -->
         <attr name="strokeWidth" format="dimension"/>
+        <!-- 边框虚线长度 -->
+        <attr name="strokeDashWidth" format="dimension"/>
+        <!-- 边框虚线间隙 -->
+        <attr name="strokeDashGap" format="dimension"/>
         <!-- 边框圆角 -->
         <attr name="strokeRadius" format="dimension"/>
         <attr name="strokeRadiusTopLeft" format="dimension"/>
@@ -45,6 +49,10 @@
         <attr name="shadowElevation" format="dimension"/>
         <!-- 阴影颜色 -->
         <attr name="shadowColor" format="reference|color"/>
+        <!-- 阴影画笔填充颜色 -->
+        <attr name="shadowBackground" format="reference|color"/>
+        <!-- 是否剪切阴影画笔填充区域 -->
+        <attr name="clipShadowPath" format="boolean"/>
         <!-- 阴影偏移（dp、px等等）-->
         <attr name="shadow_x" format="dimension"/>
         <!-- 阴影偏移（dp、px等等）-->
@@ -55,6 +63,23 @@
         <attr name="shadowRadiusTopRight" format="dimension"/>
         <attr name="shadowRadiusBottomLeft" format="dimension"/>
         <attr name="shadowRadiusBottomRight" format="dimension"/>
-
+        <!-- 渐变圆角 -->
+        <attr name="gradientRadius" format="dimension"/>
+        <attr name="gradientRadiusTopLeft" format="dimension"/>
+        <attr name="gradientRadiusTopRight" format="dimension"/>
+        <attr name="gradientRadiusBottomLeft" format="dimension"/>
+        <attr name="gradientRadiusBottomRight" format="dimension"/>
+        <!-- 渐变颜色-开始 -->
+        <attr name="gradientColorStart" format="reference|color"/>
+        <!-- 渐变颜色-结束 -->
+        <attr name="gradientColorEnd" format="reference|color"/>
+        <!-- 渐变边框宽度 -->
+        <attr name="gradientStrokeWidth" format="dimension"/>
+        <!-- 渐变边框颜色 -->
+        <attr name="gradientStrokeColor" format="reference|color"/>
+        <!-- 渐变边框虚线宽度 -->
+        <attr name="gradientStrokeDashWidth" format="dimension"/>
+        <!-- 渐变边框虚线间隙 -->
+        <attr name="gradientStrokeDashGap" format="dimension"/>
     </declare-styleable>
 </resources>

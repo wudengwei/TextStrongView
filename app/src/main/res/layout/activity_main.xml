@@ -166,6 +166,8 @@
                     app:strokeColor="#FFBE31"
                     app:strokeRadiusTopLeft="10dp"
                     app:strokeRadiusBottomRight="10dp"
+                    app:strokeDashGap="5dp"
+                    app:strokeDashWidth="10dp"
                     android:layout_marginLeft="30dp"/>
                 <com.wudengwei.textstrongview.TextStrongView
                     android:layout_width="100dp"
@@ -229,6 +231,47 @@
                     android:layout_width="100dp"
                     android:layout_height="35dp"
                     android:text="CardView"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:clipChildren="false">
+                <com.wudengwei.textstrongview.TextStrongView
+                    android:layout_width="100dp"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="获取验证码"
+                    android:textColor="#FFBE31"
+                    android:visibility="visible"
+                    app:gradientColorEnd="@color/colorAccent"
+                    app:gradientColorStart="@color/colorPrimary"
+                    app:gradientRadiusTopLeft="35dp"
+                    app:gradientStrokeWidth="2dp" />
+                <Space
+                    android:layout_width="70dp"
+                    android:layout_height="1dp" />
+                <com.wudengwei.textstrongview.TextStrongView
+                    android:layout_width="100dp"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="获取验证码"
+                    android:textColor="#FFBE31"
+                    android:visibility="visible"
+                    app:shadowRadiusTopLeft="35dp"
+                    app:shadowElevation="10dp"
+                    app:shadowColor="#43000000"
+                    app:shadow_y="6dp"
+                    app:shadow_x="6dp"
+                    app:clipShadowPath="true"
+                    app:gradientColorEnd="@color/colorAccent"
+                    app:gradientColorStart="@color/colorPrimary"
+                    app:gradientRadiusTopLeft="35dp"
+                    app:gradientStrokeWidth="2dp"
+                    app:gradientStrokeColor="@android:color/holo_orange_dark"
+                    app:gradientStrokeDashWidth="5dp"
+                    app:gradientStrokeDashGap="20dp"/>
             </LinearLayout>
             <Space
                 android:layout_width="1dp"
