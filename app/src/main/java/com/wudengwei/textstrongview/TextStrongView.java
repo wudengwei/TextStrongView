@@ -154,7 +154,7 @@ public class TextStrongView extends AppCompatTextView {
             //阴影
             shadowElevation = typedArray.getDimension(R.styleable.TextStrongView_shadowElevation, shadowElevation);
             shadowColor = typedArray.getColor(R.styleable.TextStrongView_shadowColor, Color.BLACK);
-            shadowBackground = typedArray.getColor(R.styleable.TextStrongView_shadowBackground, Color.BLACK);
+            shadowBackground = typedArray.getColor(R.styleable.TextStrongView_shadowBackground, Color.WHITE);
             clipShadowPath = typedArray.getBoolean(R.styleable.TextStrongView_clipShadowPath, clipShadowPath);
             float shadowRadius = typedArray.getDimension(R.styleable.TextStrongView_shadowRadius, 0);
             shadowRadiusTopLeft = typedArray.getDimension(R.styleable.TextStrongView_shadowRadiusTopLeft, shadowRadius);

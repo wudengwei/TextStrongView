@@ -198,14 +198,14 @@
                     android:visibility="visible"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    app:strokeWidth="0dp"
-                    app:strokeColor="#FFBE31"
                     app:strokeRadius="10dp"
                     app:shadowRadius="10dp"
                     app:shadowElevation="10dp"
+                    app:shadowBackground="@color/colorAccent"
                     app:shadowColor="#43000000"
                     app:shadow_y="6dp"
-                    app:shadow_x="6dp"/>
+                    app:shadow_x="6dp"
+                    app:clipShadowPath="false"/>
                 <Space
                     android:layout_width="70dp"
                     android:layout_height="1dp" />
